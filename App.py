@@ -22,7 +22,7 @@ class AbstractScreen():
 
 class App():
     """An App, a system for showing screens to the user and handling their button presses. Apps are
-    designed to be driven by user input and not designed (yet) for running background tasks.
+    designed to be user button pressed and not designed (yet) for running background tasks.
     """
     BUTTONS = {
         "a":badger2040.BUTTON_A,

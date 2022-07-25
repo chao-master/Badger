@@ -37,13 +37,29 @@ class App():
         """Create a new app, for more on apps see the help on the type.
 
         Args:
-            badger (Badger2040): Badger instance to draw to
+            badger (Badger2040|bytearray|boolean): Either:
+                * The Badger2040 instance to draw to,
+                * A bytearray, to use as a frame buffer for a new Badger2040 instance,
+                * True to setup a new Badger2040 instance with a python managed frame buffer, or
+                * False to create a new Badger2040 instance with a C managed frame buffer
             timeToSleep (int, optional): Number of seconds after the last input before the badger sleeps. Defaults to 30.
             ledOff (int, optional): Brightness of the LED whilst sleeping, not on battery power the LED is off while sleeping. Defaults to 85.
             ledLow (int, optional): Brightness of the LED while the app is idle and can accept user input. Defaults to 170.
             ledHigh (int, optional): Brightness of the LED while the app is active and processing. Defaults to 255.
         """
-        self.badger = badger
+        if badger == True:
+            self.framebuffer = bytearray(badger2040.WIDTH*badger2040.HEIGHT//8)
+            self.badger = badger2040.Badger2040(self.framebuffer)
+        elif isinstance(badger,bytearray):
+            self.framebuffer = badger
+            self.badger = badger2040.Badger2040(self.framebuffer)
+        elif isinstance(badger,badger2040.Badger2040):
+            self.framebuffer = None
+            self.badger = badger
+        else:
+            self.framebuffer = None
+            self.badger = badger2040.Badger2040()
+
         self.timeToSleep = timeToSleep
         self.ledOff = ledOff
         self.ledLow = ledLow

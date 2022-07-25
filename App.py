@@ -42,7 +42,7 @@ class App():
                 * A bytearray, to use as a frame buffer for a new Badger2040 instance,
                 * True to setup a new Badger2040 instance with a python managed frame buffer, or
                 * False to create a new Badger2040 instance with a C managed frame buffer
-            timeToSleep (int, optional): Number of seconds after the last input before the badger sleeps. Defaults to 30.
+            timeToSleep (int, optional): Number of seconds after the last input before the badger sleeps, if negative app will never sleep. Defaults to 30.
             ledOff (int, optional): Brightness of the LED whilst sleeping, not on battery power the LED is off while sleeping. Defaults to 85.
             ledLow (int, optional): Brightness of the LED while the app is idle and can accept user input. Defaults to 170.
             ledHigh (int, optional): Brightness of the LED while the app is active and processing. Defaults to 255.
@@ -187,7 +187,7 @@ class App():
 
         # Put the badger to sleep and turn off the led,
         # if we are not waiting on an update, and it's been at least 30s
-        if self.nextUpdateAt is None and time.time() >= self.sleepAt:
+        if self.timeToSleep > 0 and self.nextUpdateAt is None and time.time() >= self.sleepAt:
             print("Loop action sleep")
             preSleepUpdateSpeed = self.onSleep()
             if preSleepUpdateSpeed != NO_UPDATE:

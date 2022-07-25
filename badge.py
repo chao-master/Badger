@@ -72,6 +72,9 @@ class Badge(AbstractScreen):
         self.lines = [None]*N_PRONOUNS
         self.pronouns = [None]*N_ABOUT_LINES
         
+        self.loadState()
+        
+    def loadState(self):
         try:
             with open(STATE_FILE) as f:
                 data = json.load(f)
@@ -83,18 +86,18 @@ class Badge(AbstractScreen):
         except OSError:
             pass  
     
-    def setImage(self,imageFile):
-        self.imageName = imageFile
-        with open(imageFile) as f:
-            f.readinto(self.image)
-    
-    def updateState(self):
+    def onSleep(self,wasVisible,willBeVisible):
         with open(STATE_FILE,"w") as f:
             data = json.dump({
                 "imageName":self.imageName,
                 "lines":self.lines,
                 "pronouns":self.pronouns
             },f)
+    
+    def setImage(self,imageFile):
+        self.imageName = imageFile
+        with open(imageFile) as f:
+            f.readinto(self.image)
     
     def drawText(self,textData,x,y):
         self.badger.font(FONT)
@@ -253,7 +256,6 @@ class SelectorBase(AbstractScreen):
     
     def button_b(self):
         self.selTtxtsOld = self.selTxts[:]
-        self.badge.updateState()
         self.app.setScreen(self.badge)
     
     def button_c(self):
@@ -403,7 +405,6 @@ class IconSelector(AbstractScreen):
     
     def button_c(self):
         self.badge.setImage("badges/images/"+self.fileNames[self.index])
-        self.badge.updateState()
         self.app.setScreen(self.badge)
     
     def button_up(self):

@@ -10,6 +10,11 @@ What can I say, 5 years of professional object oriented coding has made me a bit
 
 The architecture might by no means be perfect, but this is after 3 or so iterations of it, so I'm happy with where it is now.
 
+## How stable is it?
+
+Not at all!  
+All changes may be breaking at this point, we're in the go fast and break stuff stage of development, and I did mostly upload this to show my friends. I'll try to be a good little kitty and document any breaking changes I make each commit, but I'm not running rigirous tests aganist old versions here!
+
 ## How do I use the badge!
 If you're just here for the badge:
 

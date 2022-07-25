@@ -14,7 +14,7 @@ class AbstractScreen():
         self.app = app
         self.badger = app.badger
 
-    def onSleep(self):
+    def onSleep(self,wasVisible,willBeVisible):
         return NO_UPDATE
 
     def drawAll(self):
@@ -116,8 +116,13 @@ class App():
             int: The speed the screen should be updated at, or NO_UPDATE (-1) if none is needed
         """
         if self.returnTo is not None:
+            prevScreen = self.active
             if self.setScreen(self.returnTo,doUpdate = False):
+                self.active.onSleep(False,True)
+                prevScreen.onSleep(True,False)
                 return badger2040.UPDATE_NORMAL
+            else:
+                self.active.onSleep(True,True)
         return NO_UPDATE 
 
     def loop(self):

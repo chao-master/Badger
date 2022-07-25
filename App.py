@@ -33,7 +33,7 @@ class App():
         "user":badger2040.BUTTON_USER,
     }
 
-    def __init__(self,badger,*,timeToSleep=30,ledOff=85,ledLow=170,ledHigh=255):
+    def __init__(self,badger,*,timeToSleep=30,ledHalt=85,ledInactive=170,ledActive=0):
         """Create a new app, for more on apps see the help on the type.
 
         Args:
@@ -43,9 +43,9 @@ class App():
                 * True to setup a new Badger2040 instance with a python managed frame buffer, or
                 * False to create a new Badger2040 instance with a C managed frame buffer
             timeToSleep (int, optional): Number of seconds after the last input before the badger sleeps, if negative app will never sleep. Defaults to 30.
-            ledOff (int, optional): Brightness of the LED whilst sleeping, not on battery power the LED is off while sleeping. Defaults to 85.
-            ledLow (int, optional): Brightness of the LED while the app is idle and can accept user input. Defaults to 170.
-            ledHigh (int, optional): Brightness of the LED while the app is active and processing. Defaults to 255.
+            ledHalt (int, optional): Brightness of the LED whilst sleeping, not on battery power the LED is off while sleeping. Defaults to 85.
+            ledInactive (int, optional): Brightness of the LED while the app is idle and can accept user input. Defaults to 170.
+            ledActive (int, optional): Brightness of the LED while the app is active and processing. Defaults to 255.
         """
         if badger == True:
             self.framebuffer = bytearray(badger2040.WIDTH*badger2040.HEIGHT//8)
@@ -61,11 +61,11 @@ class App():
             self.badger = badger2040.Badger2040()
 
         self.timeToSleep = timeToSleep
-        self.ledOff = ledOff
-        self.ledLow = ledLow
-        self.ledHigh = ledHigh
+        self.ledHalt = ledHalt
+        self.ledInactive = ledInactive
+        self.ledActive = ledActive
         
-        self.badger.led(self.ledHigh)
+        self.badger.led(self.ledActive)
         self.active = None
         self.nextUpdateSpeed = None
         self.nextUpdateAt = None
@@ -155,7 +155,7 @@ class App():
             for b in buttons:
                 f = getattr(self.active,f"button_{b}",None)
                 if f is not None:
-                    self.badger.led(self.ledHigh)
+                    self.badger.led(self.ledActive)
                     activated = True
                     f()
                     break
@@ -166,7 +166,7 @@ class App():
         # Screen Update handling
         if self.nextUpdateAt is not None and time.time() >= self.nextUpdateAt:
             print("Loop action update")
-            self.badger.led(self.ledHigh)
+            self.badger.led(self.ledActive)
             activated = True
             self.badger.update_speed(self.nextUpdateSpeed)
             self.badger.update()
@@ -176,7 +176,7 @@ class App():
         # If actioned, dim led
         if activated:
             print("Loop action clear")
-            self.badger.led(self.ledLow)
+            self.badger.led(self.ledInactive)
             at = time.localtime(self.sleepAt)
             print(f"> Sleep will occur at {at[3]}:{at[4]}:{at[5]}")
             if self.nextUpdateAt is None:
@@ -193,13 +193,13 @@ class App():
             if preSleepUpdateSpeed != NO_UPDATE:
                 self.badger.update_speed(preSleepUpdateSpeed)
                 self.badger.update()
-            self.badger.led(self.ledOff)
+            self.badger.led(self.ledHalt)
             self.badger.halt()
-            self.badger.led(self.ledLow)
+            self.badger.led(self.ledInactive)
     
     def runForever(self):
         """Runs the loop function forever, call this to start the App"""
-        self.badger.led(self.ledLow)
+        self.badger.led(self.ledInactive)
         while True:
             self.loop()
             time.sleep(0.1)
